@@ -82,17 +82,61 @@
 
       <!-- Operations -->
 
+      <!-- Operation: Transfer -->
+
       <section class="section-operations section-operations--transfer">
-        Transfer
+        <h2>Transfer</h2>
+        <form class="form form--transfer">
+          <input type="text" class="form-input form-input--to" />
+          <input type="number" class="form-input form-input--amount" />
+          <button class="form-btn form-btn--transfer">&rarr;</button>
+          <label for="form-input--to" class="form-label form-label--transfer"
+            >Transfer to</label
+          >
+          <label for="form-input--amount" class="form-label form-label--amount"
+            >Amount</label
+          >
+        </form>
       </section>
+
+      <!-- Operation: Loan -->
+
       <section class="section-operations section-operations--loan">
-        Loan
+        <h2>Loan</h2>
+        <form class="form form--loan">
+          <input type="number" class="form-input form-input--amount" />
+          <button class="form-btn form-btn--loan">&rarr;</button>
+          <label for="form-btn--loan" class="form-label form-label--loan"
+            >Amount</label
+          >
+        </form>
       </section>
+
+      <!-- Operation: Close -->
+
       <section class="section-operations section-operations--close-acc">
-        Close acc
+        <h2>Close acc</h2>
+        <form class="form form--close">
+          <input type="text" class="form-input form-input--username" />
+          <input type="number" class="form-input form-input--pin" />
+          <button class="form-btn form-btn--close">&rarr;</button>
+          <label
+            for="form-input--username"
+            class="form-label form-label--confirm-user"
+            >Comfirm user</label
+          >
+          <label for="form-input--pin" class="form-label form-lable--pin"
+            >Confirm PIN</label
+          >
+        </form>
       </section>
-      <section class="section-operations section-operations--logout-timer">
-        Timer
+
+      <!-- Logout Timer -->
+
+      <section class="section-logout-timer">
+        <p class="logout-timer">
+          You will logged out in <span class="timer">05:00</span>
+        </p>
       </section>
     </main>
 
