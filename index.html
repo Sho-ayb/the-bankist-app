@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Link to stylesheet -->
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- Link to Google font api -->
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+    </style>
+
+    <title>The Bankist App</title>
+  </head>
+  <body>
+    <header>
+      <nav class="header-nav">
+        <p class="welcome">Log in to get started</p>
+        <img src="images/logo.png" alt="Logo" class="header-logo" />
+        <form class="login-form">
+          <input type="text" placeholder="Username" class="login-input" />
+          <input type="password" placeholder="Password" class="login-input" />
+          <button class="login-btn">&rarr;</button>
+        </form>
+      </nav>
+    </header>
+
+    <main class="main">
+      <section class="section-balance">
+        <div>
+          <p class="balance-label">Current balance</p>
+          <p class="balance-date">As of <span class="date">20/02/24</span></p>
+        </div>
+        <div>
+          <p class="balance-value">0000£</p>
+        </div>
+      </section>
+      <section class="section-movements">
+        <div class="movements-row">
+          <div class="movements-type movements-type--deposit">2 deposit</div>
+
+          <div class="movements-info">
+            <div class="movements-date">3 days ago</div>
+            <dive class="movements-value">4000£</dive>
+          </div>
+        </div>
+        <div class="movements-row">
+          <div class="movements-type movements-type--withdrawal">
+            1 withdrawal
+          </div>
+          <div class="movements-info">
+            <div class="movements-date">20/02/2024</div>
+            <div class="movements-value">-378£</div>
+          </div>
+        </div>
+      </section>
+      <section class="section-summary">
+        <div class="summary-row">
+          <div class="summary-info">
+            <p class="summary-label">In</p>
+            <p class="summary-value summary-value--in">0000£</p>
+            <p class="summary-label">Out</p>
+            <p class="summary-value summary-value--out">-0000£</p>
+            <p class="summary-label">Interest</p>
+            <p class="summary-value summary-value--interest">0000£</p>
+          </div>
+
+          <div class="summary-sort">
+            <button class="summary-sort-btn">&downarrow; Sort</button>
+          </div>
+        </div>
+      </section>
+      <section class="section-transfer">Transfer</section>
+      <section class="section-loan">Loan</section>
+      <section class="section-close-acc">Close acc</section>
+      <section class="section-logout-timer">Timer</section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        This application is part of &copy; Jonas Schmedtmann course on Udemy:
+        <a href="">The Complete Javascript Course from Zero to Expert: 2024</a>
+      </p>
+      <p>Created by Sho'ayb</p>
+    </footer>
+
+    <script type="text/javascript" src="script.js"></script>
+  </body>
+</html>
