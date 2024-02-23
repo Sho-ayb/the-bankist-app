@@ -410,3 +410,11 @@ header .header-nav .login-btn {
 .footer a:hover {
   color: var(--bg-green-color);
 }
+
+/* Hide the app */
+
+/* Instead utilising display:none; setting the opacity to nill ensures that the footer element remains at the bottom of page */
+
+.hidden {
+  opacity: 0;
+}
