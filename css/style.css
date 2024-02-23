@@ -330,7 +330,7 @@ header .header-nav .login-btn {
   display: grid;
   grid-template-columns: 1.5fr 1.5fr 0.5fr;
   grid-template-rows: auto auto;
-  gap: 1em;
+  gap: 0.8em 1em;
 }
 
 .section-operations .form .form-input {
@@ -349,6 +349,11 @@ header .header-nav .login-btn {
 .form .form-input:focus {
   outline: none;
   background-color: var(--grey-form-input-color);
+}
+
+.form .form-label {
+  font-size: 1.4rem;
+  font-weight: 500;
 }
 
 /* Exceptions  */
