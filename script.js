@@ -7,6 +7,7 @@ const account1 = {
   movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
   interestRate: 1.2, // %
   pin: 1111,
+  locale: 'pt-PT',
 };
 
 const account2 = {
@@ -14,6 +15,7 @@ const account2 = {
   movements: [5000, 3400, -150, -790, -3210, -1000, 8500, -30],
   interestRate: 1.5,
   pin: 2222,
+  locale: 'en-US',
 };
 
 const account3 = {
@@ -21,6 +23,7 @@ const account3 = {
   movements: [200, -200, 340, -300, -20, 50, 400, -460],
   interestRate: 0.7,
   pin: 3333,
+  locale: 'en-GB',
 };
 
 const account4 = {
@@ -28,6 +31,7 @@ const account4 = {
   movements: [430, 1000, 700, 50, 90],
   interestRate: 1,
   pin: 4444,
+  locale: 'fr-FR',
 };
 
 // Global Variables
@@ -88,6 +92,8 @@ const createUsernames = function (accs) {
 
 console.log(accounts);
 
+//  Invoke the function here: so username property is created in object
+
 createUsernames(accounts);
 
 // Find the correct account
@@ -106,16 +112,59 @@ const calcBalance = function (acc) {
   return balance;
 };
 
-// Get the current date
+// Get the current date and time
 
-const getNowDate = function () {
+const getNowDateAndTime = function (locale) {
   const now = new Date();
 
-  const day = `${now.getDate()}`.padStart(2, 0);
-  const month = `${now.getMonth() + 1}`.padStart(2, 0);
-  const year = now.getFullYear();
+  const options = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+    timeZone: 'UTC',
+  };
 
-  return `${day}/${month}/${year}`;
+  const dateTime = now.toLocaleString(locale, options);
+
+  console.log(typeof dateTime, dateTime); // e.g. expect 25/02/2024, 17:18:34
+
+  // We need to format the above dateTime in way that the Date constructor can accept
+
+  const [datePart, timePart] = dateTime.split(', '); // there is char empty space after date
+
+  console.log(datePart, timePart);
+
+  const [day, month, year] = datePart.split('/');
+
+  console.log(day, month, year);
+
+  return `${year}-${month}-${day}T${timePart}`;
+};
+
+// Creating a function to generate movementDates array in account object returns isoString date format
+
+const createMovementDates = function (acc) {
+  // Check if the acc is an object
+  if (typeof acc !== 'object' || typeof acc === null) {
+    console.error('Expected an object, but received', acc);
+    return; // exists the function early
+  }
+
+  const currentDateAndTime = getNowDateAndTime(currentAccount.locale); // uses our function to get and time
+
+  console.log(currentDateAndTime);
+
+  acc.movementDates = Array.from({ length: 8 }, (_, i) => {
+    const date = new Date(currentDateAndTime);
+    console.log(date);
+    date.setDate(date.getDate() - i);
+
+    return date.toISOString();
+  }).reverse();
 };
 
 // Display Movements
@@ -169,7 +218,7 @@ const displayUi = function (acc) {
 
   // Display date
 
-  labelDate.textContent = `${getNowDate()}`;
+  labelDate.textContent = getNowDateAndTime(currentAccount.locale);
 
   // Display movements
 
@@ -207,6 +256,11 @@ btnLogin.addEventListener('click', function (e) {
     // Clear the input fields
 
     inputLoginUsername.value = inputLoginPin.value = '';
+    inputLoginUsername.blur();
+    inputLoginPin.blur();
+
+    // Creating the side-effect in accounts object for movementDates
+    createMovementDates(currentAccount);
 
     // Display current account
 
