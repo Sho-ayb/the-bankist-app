@@ -114,7 +114,7 @@ const calcBalance = function (acc) {
 
 // Get the current date and time
 
-const getNowDateAndTime = function (locale) {
+const getNowDateAndTime = function (locale, isISOString = false) {
   const now = new Date();
 
   const options = {
@@ -128,7 +128,9 @@ const getNowDateAndTime = function (locale) {
     timeZone: 'UTC',
   };
 
-  const dateTime = now.toLocaleString(locale, options);
+  // const dateTime = now.toLocaleString(locale, options);
+
+  const dateTime = new Intl.DateTimeFormat(locale, options).format(now);
 
   console.log(typeof dateTime, dateTime); // e.g. expect 25/02/2024, 17:18:34
 
@@ -142,7 +144,11 @@ const getNowDateAndTime = function (locale) {
 
   console.log(day, month, year);
 
-  return `${year}-${month}-${day}T${timePart}`;
+  if (isISOString) {
+    return `${year}-${month}-${day}T${timePart}`;
+  } else {
+    return `${day}/${month}/${year} ${timePart}`;
+  }
 };
 
 // Creating a function to generate movementDates array in account object returns isoString date format
@@ -154,18 +160,24 @@ const createMovementDates = function (acc) {
     return; // exists the function early
   }
 
-  const currentDateAndTime = getNowDateAndTime(currentAccount.locale); // uses our function to get and time
+  const isoString = getNowDateAndTime(currentAccount.locale, true); // uses our function to get date and time
 
-  console.log(currentDateAndTime);
+  console.log(isoString);
 
   acc.movementDates = Array.from({ length: 8 }, (_, i) => {
-    const date = new Date(currentDateAndTime);
+    const date = new Date(isoString);
     console.log(date);
     date.setDate(date.getDate() - i);
 
     return date.toISOString();
   }).reverse();
 };
+
+// Format movements
+
+// This function will render a day date string on each movement row
+
+const formatMovementDate = function (date) {};
 
 // Display Movements
 
@@ -220,23 +232,25 @@ const displayUi = function (acc) {
 
   // we need to parse the isoString to a Date object
 
-  const isoString = getNowDateAndTime(currentAccount.locale);
+  const dateString = getNowDateAndTime(currentAccount.locale);
 
-  console.log(isoString);
+  console.log(dateString);
 
   // isoString is an object so we can construct our formatted date
 
-  const dateAndTime = new Date(isoString);
+  // const dateAndTime = new Date(isoString);
 
-  const day = `${dateAndTime.getDate()}`.padStart(2, 0);
-  const month = `${dateAndTime.getMonth() + 1}`.padStart(2, 0);
-  const year = dateAndTime.getFullYear().toString();
-  const hours = `${dateAndTime.getHours()}`.padStart(2, 0);
-  const minutes = `${dateAndTime.getMinutes()}`.padStart(2, 0);
+  // const day = `${dateAndTime.getDate()}`.padStart(2, 0);
+  // const month = `${dateAndTime.getMonth() + 1}`.padStart(2, 0);
+  // const year = dateAndTime.getFullYear().toString();
+  // const hours = `${dateAndTime.getHours()}`.padStart(2, 0);
+  // const minutes = `${dateAndTime.getMinutes()}`.padStart(2, 0);
 
-  console.log(day, month, year, hours, minutes);
+  // console.log(day, month, year, hours, minutes);
 
-  labelDate.textContent = `${day}/${month}/${year}, ${hours}:${minutes}`;
+  // labelDate.textContent = `${day}/${month}/${year}, ${hours}:${minutes}`;
+
+  labelDate.textContent = dateString;
 
   // Display movements
 
