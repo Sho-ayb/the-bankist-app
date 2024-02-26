@@ -218,7 +218,25 @@ const displayUi = function (acc) {
 
   // Display date
 
-  labelDate.textContent = getNowDateAndTime(currentAccount.locale);
+  // we need to parse the isoString to a Date object
+
+  const isoString = getNowDateAndTime(currentAccount.locale);
+
+  console.log(isoString);
+
+  // isoString is an object so we can construct our formatted date
+
+  const dateAndTime = new Date(isoString);
+
+  const day = `${dateAndTime.getDate()}`.padStart(2, 0);
+  const month = `${dateAndTime.getMonth() + 1}`.padStart(2, 0);
+  const year = dateAndTime.getFullYear().toString();
+  const hours = `${dateAndTime.getHours()}`.padStart(2, 0);
+  const minutes = `${dateAndTime.getMinutes()}`.padStart(2, 0);
+
+  console.log(day, month, year, hours, minutes);
+
+  labelDate.textContent = `${day}/${month}/${year}, ${hours}:${minutes}`;
 
   // Display movements
 
