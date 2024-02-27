@@ -212,7 +212,7 @@ const displayMovements = function (acc, sort = false) {
   // Clear the movements container
   containerMovements.innerHTML = '';
 
-  console.log(acc);
+  console.log(acc.movements);
 
   // Sorting movements - using slice() here to return a shallow copy
 
@@ -311,7 +311,7 @@ const startLogOutTimer = function () {
   // Logout function
 
   const logOut = function () {
-    app.style.opacity = 0;
+    app.classList.add('hidden');
     clearInterval(clock);
   };
 
@@ -381,6 +381,16 @@ const displayUi = function (acc) {
   startLogOutTimer();
 };
 
+// Helper function to toggle the movements in ascending & descending order
+
+let sorted = false;
+
+const toggleMovementsOrder = function () {
+  sorted = !sorted;
+
+  displayMovements(currentAccount, sorted);
+};
+
 // Event Handlers
 
 // User needs to login with username and password stored as Pin
@@ -420,3 +430,7 @@ btnLogin.addEventListener('click', function (e) {
     displayUi(currentAccount);
   }
 });
+
+// Movements will be sorted when clicked
+
+btnSort.addEventListener('click', toggleMovementsOrder);
