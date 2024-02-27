@@ -8,6 +8,7 @@ const account1 = {
   interestRate: 1.2, // %
   pin: 1111,
   locale: 'pt-PT',
+  currency: 'EUR',
 };
 
 const account2 = {
@@ -16,6 +17,7 @@ const account2 = {
   interestRate: 1.5,
   pin: 2222,
   locale: 'en-US',
+  currency: 'USD',
 };
 
 const account3 = {
@@ -24,6 +26,7 @@ const account3 = {
   interestRate: 0.7,
   pin: 3333,
   locale: 'en-GB',
+  currency: 'GBP',
 };
 
 const account4 = {
@@ -32,9 +35,12 @@ const account4 = {
   interestRate: 1,
   pin: 4444,
   locale: 'fr-FR',
+  currency: 'EUR',
 };
 
 // Global Variables
+
+let timeToLogout = 300; // 300 seconds = 5 mins
 
 let currentAccount;
 
@@ -224,6 +230,9 @@ const displayMovements = function (acc, sort = false) {
       getNowDateAndTime(acc.locale, true),
       acc.movementDates[i]
     );
+
+    const movementVals = formatCur(mov, acc.locale, acc.currency);
+
     const html = `
       
     <div class="movements-row">
@@ -233,7 +242,7 @@ const displayMovements = function (acc, sort = false) {
 
         <div class="movements-info">
         <div class="movements-date">${displayMovementsDate}</div>
-        <div class="movements-value">${mov}£</div>
+        <div class="movements-value">${movementVals}</div>
     </div>
           
       `;
@@ -244,6 +253,82 @@ const displayMovements = function (acc, sort = false) {
   });
 };
 
+// A factory function to return display summary calculations
+
+const calcDisplaySummary = function (acc) {
+  console.log(acc);
+  // Income
+
+  const incomes = acc.movements
+    .filter((mov) => mov > 0)
+    .reduce((acc, mov) => acc + mov, 0);
+
+  // Withdrawals
+
+  const withdrawals = acc.movements
+    .filter((mov) => mov < 0)
+    .reduce((acc, mov) => acc + mov, 0);
+
+  // Interest
+
+  const interest = acc.movements
+    .filter((mov) => mov > 0)
+    .map((deposit) => (deposit * acc.interestRate) / 100)
+    .filter((int) => int >= 1)
+    .reduce((prev, curr) => prev + curr, 0);
+
+  console.log(incomes, withdrawals, interest);
+
+  return {
+    incomes,
+    withdrawals,
+    interest,
+  };
+};
+
+// Currency formatter function - this is a simple function - we can pass in any value: the movements and/or the return values from calcDisplaySummary
+
+const formatCur = function (value, locale, currency) {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currency,
+  }).format(value);
+};
+
+// Timer function
+
+const startLogOutTimer = function () {
+  let counter = 0;
+  let currentTime = timeToLogout - counter;
+
+  const convertToString = (s) => {
+    const mins = String(Math.floor(s / 60));
+    const secs = String(s % 60);
+
+    return mins.padStart(2, 0) + ':' + secs.padStart(2, 0);
+  };
+
+  // Logout function
+
+  const logOut = function () {
+    app.style.opacity = 0;
+    clearInterval(clock);
+  };
+
+  // Ticker function
+
+  const tick = function () {
+    counter++;
+    currentTime = timeToLogout - counter;
+
+    currentTime >= 0
+      ? (labelTimer.textContent = convertToString(currentTime))
+      : logOut();
+  };
+
+  const clock = setInterval(tick, 1000);
+};
+
 // Display Ui
 
 const displayUi = function (acc) {
@@ -251,7 +336,7 @@ const displayUi = function (acc) {
 
   // Creating a side-effect adding balance property to acc
   acc.balance = calcBalance(acc);
-  labelBalance.textContent = `${acc.balance}£`;
+  labelBalance.textContent = formatCur(acc.balance, acc.locale, acc.currency);
 
   // Display date
 
@@ -268,7 +353,32 @@ const displayUi = function (acc) {
   displayMovements(acc);
 
   // Display Summary
+
+  const incomesLable = formatCur(
+    calcDisplaySummary(acc).incomes,
+    acc.locale,
+    acc.currency
+  );
+
+  const withdrawalsLable = formatCur(
+    calcDisplaySummary(acc).withdrawals,
+    acc.locale,
+    acc.currency
+  );
+
+  const interestLable = formatCur(
+    calcDisplaySummary(acc).interest,
+    acc.locale,
+    acc.currency
+  );
+
+  labelSumIn.textContent = `${incomesLable}`;
+  labelSumOut.textContent = `${withdrawalsLable}`;
+  labelSumInterest.textContent = `${interestLable}`;
+
   // Start the timer
+
+  startLogOutTimer();
 };
 
 // Event Handlers
