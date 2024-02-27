@@ -208,6 +208,10 @@ const formatMovementDate = function (isoStringDate, movementDate) {
 
 // Display Movements
 
+// Variable to keep track of the index for sorting movement dates
+
+let currentIndex = 0;
+
 const displayMovements = function (acc, sort = false) {
   // Clear the movements container
   containerMovements.innerHTML = '';
@@ -226,10 +230,17 @@ const displayMovements = function (acc, sort = false) {
   movs.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
 
-    const displayMovementsDate = formatMovementDate(
-      getNowDateAndTime(acc.locale, true),
-      acc.movementDates[i]
-    );
+    currentIndex = sort ? movs.length - 1 - i : i;
+
+    const displayMovementsDate = sort
+      ? formatMovementDate(
+          getNowDateAndTime(acc.locale, true),
+          acc.movementDates[currentIndex]
+        )
+      : formatMovementDate(
+          getNowDateAndTime(acc.locale, true),
+          acc.movementDates[i]
+        );
 
     const movementVals = formatCur(mov, acc.locale, acc.currency);
 
