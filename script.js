@@ -160,7 +160,7 @@ const createMovementDates = function (acc) {
     return; // exists the function early
   }
 
-  const isoString = getNowDateAndTime(currentAccount.locale, true); // uses our function to get date and time
+  const isoString = getNowDateAndTime(currentAccount.locale, true); // uses our function to get date and time as an isoString
 
   console.log(isoString);
 
@@ -177,7 +177,28 @@ const createMovementDates = function (acc) {
 
 // This function will render a day date string on each movement row
 
-const formatMovementDate = function (date) {};
+const formatMovementDate = function (isoStringDate, movementDate) {
+  // Converting the isoString in to a timestamp in milliseconds
+  const currentTimestamp = Date.parse(isoStringDate);
+  const movementTimestamp = Date.parse(movementDate);
+
+  console.log(currentTimestamp, movementTimestamp);
+
+  // Calculating the difference between the two timestamps
+
+  const diffInMilliseconds = currentTimestamp - movementTimestamp;
+  const diffInDays = diffInMilliseconds / (1000 * 60 * 60 * 24);
+
+  console.log(diffInMilliseconds, diffInDays);
+
+  // I will use a ternary operation instead of if statements but the principle is much the same
+
+  return diffInDays < 1
+    ? 'Today'
+    : diffInDays < 2
+    ? 'Yesterday'
+    : `${Math.floor(diffInDays)} days ago`;
+};
 
 // Display Movements
 
@@ -199,6 +220,10 @@ const displayMovements = function (acc, sort = false) {
   movs.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
 
+    const displayMovementsDate = formatMovementDate(
+      getNowDateAndTime(acc.locale, true),
+      acc.movementDates[i]
+    );
     const html = `
       
     <div class="movements-row">
@@ -207,7 +232,7 @@ const displayMovements = function (acc, sort = false) {
         </div>
 
         <div class="movements-info">
-        <div class="movements-date">3 days ago</div>
+        <div class="movements-date">${displayMovementsDate}</div>
         <div class="movements-value">${mov}£</div>
     </div>
           
@@ -235,20 +260,6 @@ const displayUi = function (acc) {
   const dateString = getNowDateAndTime(currentAccount.locale);
 
   console.log(dateString);
-
-  // isoString is an object so we can construct our formatted date
-
-  // const dateAndTime = new Date(isoString);
-
-  // const day = `${dateAndTime.getDate()}`.padStart(2, 0);
-  // const month = `${dateAndTime.getMonth() + 1}`.padStart(2, 0);
-  // const year = dateAndTime.getFullYear().toString();
-  // const hours = `${dateAndTime.getHours()}`.padStart(2, 0);
-  // const minutes = `${dateAndTime.getMinutes()}`.padStart(2, 0);
-
-  // console.log(day, month, year, hours, minutes);
-
-  // labelDate.textContent = `${day}/${month}/${year}, ${hours}:${minutes}`;
 
   labelDate.textContent = dateString;
 
