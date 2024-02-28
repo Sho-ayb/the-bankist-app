@@ -371,6 +371,7 @@ header .header-nav .login-btn {
 .form .form-btn {
   border-radius: var(--border-radius-form-inputs);
   border: none;
+  cursor: pointer;
 }
 
 .form .form-btn:focus {

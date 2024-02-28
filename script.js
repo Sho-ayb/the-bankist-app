@@ -42,7 +42,7 @@ const account4 = {
 
 let timeToLogout = 300; // 300 seconds = 5 mins
 
-let currentAccount;
+let currentAccount, clock;
 
 const accounts = [account1, account2, account3, account4];
 
@@ -76,7 +76,9 @@ const btnSort = document.querySelector('.summary-sort-btn');
 const inputLoginUsername = document.querySelector('.login-input--username');
 const inputLoginPin = document.querySelector('.login-input--password');
 const inputTransferTo = document.querySelector('.form-input--to');
-const inputTransferAmount = document.querySelector('.form-input--amount');
+const inputTransferAmount = document.querySelector(
+  '.form-input--transfer-amount'
+);
 const inputLoanAmount = document.querySelector('.form-input--loan-amount');
 
 //  Functions
@@ -104,10 +106,12 @@ createUsernames(accounts);
 
 // Find the correct account
 
-const findAccount = function (accs, username, password) {
-  return accs.find(
-    (accs) => accs.username === username && accs.pin === password
-  );
+const findAccount = function (accs, username, password = true) {
+  const foundAcc = password
+    ? accs.find((accs) => accs.username === username && accs.pin === password)
+    : accs.find((accs) => accs.username === username);
+
+  return foundAcc;
 };
 
 // Calculate the balance
@@ -308,9 +312,12 @@ const formatCur = function (value, locale, currency) {
 
 // Timer function
 
+/*
+
 const startLogOutTimer = function () {
+  let clock;
   let counter = 0;
-  let currentTime = timeToLogout - counter;
+  let currentTime;
 
   const convertToString = (s) => {
     const mins = String(Math.floor(s / 60));
@@ -337,7 +344,47 @@ const startLogOutTimer = function () {
       : logOut();
   };
 
-  const clock = setInterval(tick, 1000);
+  clock = setInterval(tick, 1000);
+
+  // This function should also reset the timer and restart the timer when the user interacts with form elements in the app
+
+  const resetClock = function () {
+    counter = 0;
+    clearInterval(clock);
+    startLogOutTimer();
+  };
+
+  return {
+    resetClock: resetClock(),
+  };
+};
+*/
+
+const startLogoutTimer = function () {
+  let time = 300;
+
+  const convertToString = (s) => {
+    const mins = String(Math.floor(s / 60));
+    const secs = String(s % 60);
+
+    return `${mins.padStart(2, 0)}:${secs.padStart(2, 0)}`;
+  };
+
+  const logOut = function () {
+    app.classList.add('hidden');
+    clearInterval(clock);
+  };
+
+  const ticker = () => {
+    time >= 0 ? (labelTimer.textContent = convertToString(time)) : logOut();
+
+    time--;
+  };
+
+  ticker(); // this ensures that the ticker is invoked immediately when this function is invoked; so there is no delay
+  clock = setInterval(ticker, 1000);
+
+  return clock; // we are returning the interval id and this will be reassigned back to the global variable clock
 };
 
 // Display Ui
@@ -389,7 +436,7 @@ const displayUi = function (acc) {
 
   // Start the timer
 
-  startLogOutTimer();
+  startLogoutTimer();
 };
 
 // Helper function to toggle the movements in ascending & descending order
@@ -402,6 +449,15 @@ const toggleMovementsOrder = function () {
   displayMovements(currentAccount, sorted);
 };
 
+// Transfer function
+
+const transfer = function (amount, receiverAcc) {
+  // Clear timer
+
+  clearInterval(clock);
+  clock = startLogoutTimer();
+};
+
 // Event Handlers
 
 // User needs to login with username and password stored as Pin
@@ -410,7 +466,8 @@ btnLogin.addEventListener('click', function (e) {
   // halts the browser from reloading
   e.preventDefault();
 
-  // Find the account for the current user
+  // Find the account for the current user - password has been set to true as default argument
+
   currentAccount = findAccount(
     accounts,
     inputLoginUsername.value,
@@ -445,3 +502,20 @@ btnLogin.addEventListener('click', function (e) {
 // Movements will be sorted when clicked
 
 btnSort.addEventListener('click', toggleMovementsOrder);
+
+// Deposit will be transferred to recipient
+
+btnTransfer.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  const transferTo = inputTransferTo.value;
+  const transferAmount = +inputTransferAmount.value; // + is the same as Number() constructor function
+
+  // Searches by username
+
+  const transferToAccount = findAccount(accounts, transferTo, false);
+
+  console.log(transferToAccount, transferAmount);
+
+  transfer(transferAmount, transferToAccount);
+});
