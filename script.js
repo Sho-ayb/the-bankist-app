@@ -156,7 +156,7 @@ const createMovementDates = function (acc) {
     return; // exists the function early
   }
 
-  const currentDateTime = getNowDateTimeObj.getDateTime();
+  const currentDateTime = getNowDateTimeObj['newDate'];
 
   console.log(currentDateTime);
 
@@ -227,7 +227,9 @@ const displayMovements = function (acc, sort = false) {
 
     currentIndex = sort ? movs.length - 1 - i : i;
 
-    const date = new Date(getNowDateTimeObj.getDateTime());
+    const date = getNowDateTimeObj['newDate'];
+
+    console.log(date);
 
     const displayMovementsDate = sort
       ? formatMovementDate(
@@ -284,8 +286,6 @@ const calcDisplaySummary = function (acc) {
     .map((deposit) => (deposit * acc.interestRate) / 100)
     .filter((int) => int >= 1)
     .reduce((prev, curr) => prev + curr, 0);
-
-  console.log(incomes, withdrawals, interest);
 
   return {
     incomes,
@@ -484,14 +484,19 @@ btnTransfer.addEventListener('click', function (e) {
   transfer(transferAmount, transferToAccount);
 
   // Updating the movementDates array
-  currentAccount.movementDates.push(getNowDateTimeObj.getDateTime());
+  currentAccount.movementDates.push(
+    getNowDateTimeObj.getISOString(getNowDateTimeObj['newDate'])
+  );
 
   // We need to create the movementDates array in the receiver account
 
   createMovementDates(transferToAccount);
+  // createMovementDates(currentAccount);
 
   // Updating the movementDates array for reciever account
-  transferToAccount.movementDates.push(getNowDateTimeObj.getDateTime());
+  transferToAccount.movementDates.push(
+    getNowDateTimeObj.getISOString(getNowDateTimeObj['newDate'])
+  );
 
   // Displaying the UI
   displayUi(currentAccount);
