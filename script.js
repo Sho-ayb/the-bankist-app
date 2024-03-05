@@ -44,6 +44,10 @@ let timeToLogout = 300; // 300 seconds = 5 mins
 
 let currentAccount, clock;
 
+// Variable to keep track of the index for sorting movement dates
+
+let currentIndex = 0;
+
 const accounts = [account1, account2, account3, account4];
 
 // Query All Elements
@@ -80,6 +84,27 @@ const inputTransferAmount = document.querySelector(
   '.form-input--transfer-amount'
 );
 const inputLoanAmount = document.querySelector('.form-input--loan-amount');
+
+// Creating an object to get the date and time
+
+const getNowDateTimeObj = {
+  newDate: new Date(),
+  dateOpts: {
+    hour: 'numeric',
+    minute: 'numeric',
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+  },
+  getDateTime() {
+    return new Intl.DateTimeFormat(currentAccount.locale, this.dateOpts).format(
+      this.newDate
+    );
+  },
+  getISOString(date) {
+    return date.toISOString();
+  },
+};
 
 //  Functions
 
@@ -122,45 +147,6 @@ const calcBalance = function (acc) {
   return balance;
 };
 
-// Get the current date and time
-
-const getNowDateAndTime = function (locale, isISOString = false) {
-  const now = new Date();
-
-  const options = {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-    timeZone: 'UTC',
-  };
-
-  // const dateTime = now.toLocaleString(locale, options);
-
-  const dateTime = new Intl.DateTimeFormat(locale, options).format(now);
-
-  console.log(typeof dateTime, dateTime); // e.g. expect 25/02/2024, 17:18:34
-
-  // We need to format the above dateTime in way that the Date constructor can accept
-
-  const [datePart, timePart] = dateTime.split(', '); // there is char empty space after date
-
-  console.log(datePart, timePart);
-
-  const [day, month, year] = datePart.split('/');
-
-  console.log(day, month, year);
-
-  if (isISOString) {
-    return `${year}-${month}-${day}T${timePart}`;
-  } else {
-    return `${day}/${month}/${year} ${timePart}`;
-  }
-};
-
 // Creating a function to generate movementDates array in account object returns isoString date format
 
 const createMovementDates = function (acc) {
@@ -170,16 +156,22 @@ const createMovementDates = function (acc) {
     return; // exists the function early
   }
 
-  const isoString = getNowDateAndTime(currentAccount.locale, true); // uses our function to get date and time as an isoString
+  const currentDateTime = getNowDateTimeObj.getDateTime();
 
-  console.log(isoString);
+  console.log(currentDateTime);
+
+  // This says: if the acc.movementDates already exists, then push another isoString date and time to the array
+
+  if (acc.movementDates) {
+    acc.movementDates.push(getNowDateTimeObj.getISOString(currentDateTime));
+  }
 
   acc.movementDates = Array.from({ length: 8 }, (_, i) => {
-    const date = new Date(isoString);
+    const date = new Date(currentDateTime);
     console.log(date);
     date.setDate(date.getDate() - i);
 
-    return date.toISOString();
+    return getNowDateTimeObj.getISOString(date);
   }).reverse();
 };
 
@@ -212,10 +204,6 @@ const formatMovementDate = function (isoStringDate, movementDate) {
 
 // Display Movements
 
-// Variable to keep track of the index for sorting movement dates
-
-let currentIndex = 0;
-
 const displayMovements = function (acc, sort = false) {
   // Clear the movements container
   containerMovements.innerHTML = '';
@@ -234,15 +222,20 @@ const displayMovements = function (acc, sort = false) {
   movs.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
 
+    // The currentIndex keeps track of the movements index
+    // so that we can use it to access the movementDates array: gets the last element in the array and then at every iteration minus by index, reverses the order of the elements in the array
+
     currentIndex = sort ? movs.length - 1 - i : i;
+
+    const date = new Date(getNowDateTimeObj.getDateTime());
 
     const displayMovementsDate = sort
       ? formatMovementDate(
-          getNowDateAndTime(acc.locale, true),
+          getNowDateTimeObj.getISOString(date),
           acc.movementDates[currentIndex]
         )
       : formatMovementDate(
-          getNowDateAndTime(acc.locale, true),
+          getNowDateTimeObj.getISOString(date),
           acc.movementDates[i]
         );
 
@@ -312,54 +305,6 @@ const formatCur = function (value, locale, currency) {
 
 // Timer function
 
-/*
-
-const startLogOutTimer = function () {
-  let clock;
-  let counter = 0;
-  let currentTime;
-
-  const convertToString = (s) => {
-    const mins = String(Math.floor(s / 60));
-    const secs = String(s % 60);
-
-    return mins.padStart(2, 0) + ':' + secs.padStart(2, 0);
-  };
-
-  // Logout function
-
-  const logOut = function () {
-    app.classList.add('hidden');
-    clearInterval(clock);
-  };
-
-  // Ticker function
-
-  const tick = function () {
-    counter++;
-    currentTime = timeToLogout - counter;
-
-    currentTime >= 0
-      ? (labelTimer.textContent = convertToString(currentTime))
-      : logOut();
-  };
-
-  clock = setInterval(tick, 1000);
-
-  // This function should also reset the timer and restart the timer when the user interacts with form elements in the app
-
-  const resetClock = function () {
-    counter = 0;
-    clearInterval(clock);
-    startLogOutTimer();
-  };
-
-  return {
-    resetClock: resetClock(),
-  };
-};
-*/
-
 const startLogoutTimer = function () {
   let time = 300;
 
@@ -400,7 +345,7 @@ const displayUi = function (acc) {
 
   // we need to parse the isoString to a Date object
 
-  const dateString = getNowDateAndTime(currentAccount.locale);
+  const dateString = getNowDateTimeObj.getDateTime();
 
   console.log(dateString);
 
@@ -456,6 +401,20 @@ const transfer = function (amount, receiverAcc) {
 
   clearInterval(clock);
   clock = startLogoutTimer();
+
+  console.log(receiverAcc);
+
+  // add positive amount to reciever account
+
+  receiverAcc.movements.push(amount);
+
+  // clear transfer form inputs
+
+  inputTransferTo.value = inputTransferAmount.value = '';
+
+  setTimeout(function () {
+    alert('Transfer completed!');
+  }, 2000);
 };
 
 // Event Handlers
@@ -517,5 +476,23 @@ btnTransfer.addEventListener('click', function (e) {
 
   console.log(transferToAccount, transferAmount);
 
+  // add negative amount to current account
+
+  currentAccount.movements.push(-transferAmount);
+
+  // transfer the amount to reciever account
   transfer(transferAmount, transferToAccount);
+
+  // Updating the movementDates array
+  currentAccount.movementDates.push(getNowDateTimeObj.getDateTime());
+
+  // We need to create the movementDates array in the receiver account
+
+  createMovementDates(transferToAccount);
+
+  // Updating the movementDates array for reciever account
+  transferToAccount.movementDates.push(getNowDateTimeObj.getDateTime());
+
+  // Displaying the UI
+  displayUi(currentAccount);
 });
