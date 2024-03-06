@@ -46,7 +46,11 @@ let currentAccount, clock;
 
 // Variable to keep track of the index for sorting movement dates
 
-let currentIndex = 0;
+let sortCurrentIndex = 0;
+
+// Variable to keep track of movementDates index
+
+// let movementDatesIndex = 0;
 
 const accounts = [account1, account2, account3, account4];
 
@@ -150,6 +154,8 @@ const calcBalance = function (acc) {
 // Creating a function to generate movementDates array in account object returns isoString date format
 
 const createMovementDates = function (acc) {
+  let movementDatesIndex = 0;
+
   // Check if the acc is an object
   if (typeof acc !== 'object' || typeof acc === null) {
     console.error('Expected an object, but received', acc);
@@ -160,19 +166,30 @@ const createMovementDates = function (acc) {
 
   console.log(currentDateTime);
 
-  // This says: if the acc.movementDates already exists, then push another isoString date and time to the array
+  if (!acc.movementDates) {
+    acc.movementDates = Array.from({ length: 8 }, (_, i) => {
+      const date = new Date(currentDateTime);
+      console.log(date);
+      date.setDate(date.getDate() - i);
 
-  if (acc.movementDates) {
-    acc.movementDates.push(getNowDateTimeObj.getISOString(currentDateTime));
+      return getNowDateTimeObj.getISOString(date);
+    }).reverse();
+  } else {
+    movementDatesIndex += 1;
+
+    console.log('movementDatesIndex', movementDatesIndex);
+
+    acc.movementDates = Array.from(
+      { length: acc.movementDates.length + movementDatesIndex },
+      (_, i) => {
+        const date = new Date(currentDateTime);
+        console.log(date);
+        date.setDate(date.getDate() - i);
+
+        return getNowDateTimeObj.getISOString(date);
+      }
+    ).reverse();
   }
-
-  acc.movementDates = Array.from({ length: 8 }, (_, i) => {
-    const date = new Date(currentDateTime);
-    console.log(date);
-    date.setDate(date.getDate() - i);
-
-    return getNowDateTimeObj.getISOString(date);
-  }).reverse();
 };
 
 // Format movements
@@ -180,6 +197,7 @@ const createMovementDates = function (acc) {
 // This function will render a day date string on each movement row
 
 const formatMovementDate = function (isoStringDate, movementDate) {
+  console.log(movementDate);
   // Converting the isoString in to a timestamp in milliseconds
   const currentTimestamp = Date.parse(isoStringDate);
   const movementTimestamp = Date.parse(movementDate);
@@ -188,14 +206,14 @@ const formatMovementDate = function (isoStringDate, movementDate) {
 
   // Calculating the difference between the two timestamps
 
-  const diffInMilliseconds = currentTimestamp - movementTimestamp;
+  const diffInMilliseconds = Math.abs(currentTimestamp - movementTimestamp);
   const diffInDays = diffInMilliseconds / (1000 * 60 * 60 * 24);
 
   console.log(diffInMilliseconds, diffInDays);
 
   // I will use a ternary operation instead of if statements but the principle is much the same
 
-  return diffInDays < 1
+  return diffInDays === 0
     ? 'Today'
     : diffInDays < 2
     ? 'Yesterday'
@@ -225,21 +243,16 @@ const displayMovements = function (acc, sort = false) {
     // The currentIndex keeps track of the movements index
     // so that we can use it to access the movementDates array: gets the last element in the array and then at every iteration minus by index, reverses the order of the elements in the array
 
-    currentIndex = sort ? movs.length - 1 - i : i;
+    sortCurrentIndex = sort ? movs.length - 1 - i : i;
 
     const date = getNowDateTimeObj['newDate'];
 
     console.log(date);
 
-    const displayMovementsDate = sort
-      ? formatMovementDate(
-          getNowDateTimeObj.getISOString(date),
-          acc.movementDates[currentIndex]
-        )
-      : formatMovementDate(
-          getNowDateTimeObj.getISOString(date),
-          acc.movementDates[i]
-        );
+    const displayMovementsDate = formatMovementDate(
+      getNowDateTimeObj.getISOString(date),
+      acc.movementDates[sortCurrentIndex]
+    );
 
     const movementVals = formatCur(mov, acc.locale, acc.currency);
 
@@ -491,12 +504,6 @@ btnTransfer.addEventListener('click', function (e) {
   // We need to create the movementDates array in the receiver account
 
   createMovementDates(transferToAccount);
-  // createMovementDates(currentAccount);
-
-  // Updating the movementDates array for reciever account
-  transferToAccount.movementDates.push(
-    getNowDateTimeObj.getISOString(getNowDateTimeObj['newDate'])
-  );
 
   // Displaying the UI
   displayUi(currentAccount);
