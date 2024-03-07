@@ -438,13 +438,13 @@ const transfer = function (amount, receiverAcc) {
 // User needs to login with username and password stored as Pin
 
 btnLogin.addEventListener('click', function (e) {
+  // halts the browser from reloading
+  e.preventDefault();
+
   // Clear timer
 
   clearInterval(clock);
   clock = startLogoutTimer();
-
-  // halts the browser from reloading
-  e.preventDefault();
 
   // Find the account for the current user - password has been set to true as default argument
 
@@ -488,6 +488,11 @@ btnSort.addEventListener('click', toggleMovementsOrder);
 btnTransfer.addEventListener('click', function (e) {
   e.preventDefault();
 
+  // Clear timer
+
+  clearInterval(clock);
+  clock = startLogoutTimer();
+
   const transferTo = inputTransferTo.value;
   const transferAmount = +inputTransferAmount.value; // + is the same as Number() constructor function
 
@@ -515,4 +520,44 @@ btnTransfer.addEventListener('click', function (e) {
 
   // Displaying the UI
   displayUi(currentAccount);
+});
+
+// User will be able to get a loan - if the loan amount requested is less than 10% of the current account balance.
+
+btnLoan.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  // Clear timer
+
+  clearInterval(clock);
+  clock = startLogoutTimer();
+
+  const loanAmount = Math.floor(inputLoanAmount.value);
+
+  // We need a variable to store any movement that is >= than the loan amount, this is because: if we determined the loan based on the current balance, then a user would be able to request a loan on top of a loan. We would need another means of checking, if the user has already requested a loan previously.
+
+  const someMovement = currentAccount.movements.some(
+    (mov) => mov >= loanAmount * 0.1
+  );
+
+  console.log(someMovement);
+
+  if (loanAmount > 0 && someMovement) {
+    // To simulate a loan request from db
+
+    setTimeout(function () {
+      currentAccount.movements.push(loanAmount);
+      currentAccount.movementDates.push(
+        getNowDateTimeObj.getISOString(getNowDateTimeObj['newDate'])
+      );
+      alert('Loan Approved.');
+      displayUi(currentAccount);
+    }, 2500);
+  } else {
+    alert(
+      'Sorry, the amount requested is higher than 10% of your current balance.'
+    );
+  }
+
+  inputLoanAmount.value = '';
 });
