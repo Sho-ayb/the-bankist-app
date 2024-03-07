@@ -247,7 +247,14 @@ const displayMovements = function (acc, sort = false) {
 
     const date = getNowDateTimeObj['newDate'];
 
-    console.log(date);
+    console.log(
+      'date',
+      date,
+      'sortIndex',
+      sortCurrentIndex,
+      'foreach index',
+      i
+    );
 
     const displayMovementsDate = formatMovementDate(
       getNowDateTimeObj.getISOString(date),
@@ -391,10 +398,6 @@ const displayUi = function (acc) {
   labelSumIn.textContent = `${incomesLable}`;
   labelSumOut.textContent = `${withdrawalsLable}`;
   labelSumInterest.textContent = `${interestLable}`;
-
-  // Start the timer
-
-  startLogoutTimer();
 };
 
 // Helper function to toggle the movements in ascending & descending order
@@ -435,6 +438,11 @@ const transfer = function (amount, receiverAcc) {
 // User needs to login with username and password stored as Pin
 
 btnLogin.addEventListener('click', function (e) {
+  // Clear timer
+
+  clearInterval(clock);
+  clock = startLogoutTimer();
+
   // halts the browser from reloading
   e.preventDefault();
 
