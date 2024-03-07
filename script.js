@@ -76,7 +76,7 @@ const containerMovements = document.querySelector('.section-movements');
 const btnLogin = document.querySelector('.login-btn');
 const btnTransfer = document.querySelector('.form-btn--transfer');
 const btnLoan = document.querySelector('.form-btn--loan');
-const btnClose = document.querySelector('.form-btn-close');
+const btnClose = document.querySelector('.form-btn--close');
 const btnSort = document.querySelector('.summary-sort-btn');
 
 // Form Inputs
@@ -88,6 +88,8 @@ const inputTransferAmount = document.querySelector(
   '.form-input--transfer-amount'
 );
 const inputLoanAmount = document.querySelector('.form-input--loan-amount');
+const inputCloseUsername = document.querySelector('.form-input--username');
+const inputClosePin = document.querySelector('.form-input--pin');
 
 // Creating an object to get the date and time
 
@@ -560,4 +562,42 @@ btnLoan.addEventListener('click', function (e) {
   }
 
   inputLoanAmount.value = '';
+});
+
+// Deletes the current account
+
+btnClose.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  // Function to close the account
+
+  const closeAcc = () => {
+    if (
+      inputCloseUsername.value === currentAccount.username &&
+      +inputClosePin.value === currentAccount.pin
+    ) {
+      const index = accounts.findIndex(
+        (acc) => acc.username === currentAccount.username
+      );
+
+      console.log(index);
+
+      if (index > -1) {
+        accounts.splice(index, 1);
+        // alert('Account closed.');
+      }
+
+      inputCloseUsername.value = inputClosePin.value = '';
+
+      alert('Account closed!');
+
+      app.style.opacity = 0;
+    } else {
+      alert('There is no matching account with username and password entered.');
+    }
+  };
+
+  // Simulates a db query to delete the current account
+
+  setTimeout(closeAcc, 2 * 1000);
 });
