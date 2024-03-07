@@ -208,7 +208,7 @@ const formatMovementDate = function (isoStringDate, movementDate) {
 
   // Calculating the difference between the two timestamps
 
-  const diffInMilliseconds = Math.abs(currentTimestamp - movementTimestamp);
+  const diffInMilliseconds = currentTimestamp - movementTimestamp;
   const diffInDays = diffInMilliseconds / (1000 * 60 * 60 * 24);
 
   console.log(diffInMilliseconds, diffInDays);
@@ -258,10 +258,15 @@ const displayMovements = function (acc, sort = false) {
       i
     );
 
-    const displayMovementsDate = formatMovementDate(
-      getNowDateTimeObj.getISOString(date),
-      acc.movementDates[sortCurrentIndex]
-    );
+    const displayMovementsDate = sort
+      ? formatMovementDate(
+          getNowDateTimeObj.getISOString(date),
+          acc.movementDates[sortCurrentIndex]
+        )
+      : formatMovementDate(
+          getNowDateTimeObj.getISOString(date),
+          acc.movementDates[i]
+        );
 
     const movementVals = formatCur(mov, acc.locale, acc.currency);
 
@@ -433,6 +438,8 @@ const transfer = function (amount, receiverAcc) {
   setTimeout(function () {
     alert('Transfer completed!');
   }, 2000);
+
+  displayUi(currentAccount);
 };
 
 // Event Handlers
