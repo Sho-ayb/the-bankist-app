@@ -18,7 +18,12 @@ The Bankist App
 
 ## Description
 
-Simple Javascript application. The main purpose of which, is to learn how to interact with DOM elements using Javascript and create an application using the functional programming paradigm.
+Simple Javascript application. The main purpose of which, is to learn how to interact with DOM elements using Javascript and create an application using the functional programming paradigm. 
+
+This application is part of a course by Jonas Schmedtmann: [The Complete Javascript course 2024: From Zero to Hero](https://www.udemy.com/course/the-complete-javascript-course/) on Udemy. 
+
+
+
 
 ## Installation
 
